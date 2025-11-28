@@ -1,0 +1,27 @@
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(255) PRIMARY KEY,
+    browser TEXT,
+    os VARCHAR(255),
+    screen_width INT,
+    screen_height INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uid VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    metadata JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uid VARCHAR(255) NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    time_taken INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uid) REFERENCES users(id) ON DELETE CASCADE
+);
