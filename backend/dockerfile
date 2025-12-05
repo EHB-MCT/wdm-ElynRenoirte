@@ -1,0 +1,21 @@
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and install
+COPY package*.json ./
+
+RUN npm install
+
+# Copy project files
+COPY . .
+
+# Install wait-it tool to wait for MySQL
+RUN npm install -g wait-on
+
+# Expose port
+EXPOSE 4000
+
+# Wait for MySQL to be ready, then run migrations and start server
+CMD ["sh", "-c", "wait-on tcp:mysql:3306 && npm run migrate && npm start"]

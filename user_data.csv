@@ -1,0 +1,9 @@
+User_ID	Username	Event_Type	Metadata	Timestamp
+956b7912-8f35-4c09-a30e-a5a3a6f9daa0	Player_956b7912	hover	{"duration": 16077, "answerText": "Start Quiz Button"}	2025-12-05 16:51:54
+956b7912-8f35-4c09-a30e-a5a3a6f9daa0	Player_956b7912	click	{"x": 354, "y": 394, "target": ""}	2025-12-05 16:51:54
+956b7912-8f35-4c09-a30e-a5a3a6f9daa0	Player_956b7912	click	{"x": 49, "y": 195, "target": "startQuizBtn"}	2025-12-05 16:51:39
+956b7912-8f35-4c09-a30e-a5a3a6f9daa0	Player_956b7912	hover	{"duration": 8892.599999904633, "answerText": "Start Button"}	2025-12-05 16:51:38
+016ec8c7-558e-401f-93d1-077fdf94b1eb	Player_016ec8c7	hover	{"duration": 191948.59999990463, "answerText": "Start Button"}	2025-12-05 16:51:26
+fa3149c5-e040-4926-80f1-51cf09edbaa6	Player_fa3149c5	hover	{"duration": 41566.09999990463, "answerText": "Start Quiz Button"}	2025-12-05 16:48:07
+fa3149c5-e040-4926-80f1-51cf09edbaa6	Player_fa3149c5	click	{"x": 68, "y": 191, "target": "startQuizBtn"}	2025-12-05 16:47:30
+fa3149c5-e040-4926-80f1-51cf09edbaa6	Player_fa3149c5	hover	{"duration": 23850.700000047684, "answerText": "Start Button"}	2025-12-05 16:47:25
