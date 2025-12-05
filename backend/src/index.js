@@ -1,11 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const app = express();
 app.use(express.json());
 app.use(
 	require("cors")({
-		origin: ["http://localhost:3000", "http://127.0.0.1:3000", "file://"],
+		origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://127.0.0.1:5500", "http://localhost:5500", "file://"],
 		credentials: true,
 	})
 );
@@ -68,32 +69,24 @@ app.post("/register", async (req, res) => {
 
 //endpoint: login user
 app.post("/login", async (req, res) => {
-	const { username, password } = req.body;
 	const db = getDB();
 
 	try {
-		// Find user by username or email
-		const [users] = await db.query("SELECT id, username, email, password_hash FROM users WHERE username = ? OR email = ?", [username, username]);
-
-		if (users.length === 0) {
-			return res.status(401).json({ error: "Invalid credentials" });
-		}
-
-		const user = users[0];
-
-		// Verify password
-		const isValidPassword = await bcrypt.compare(password, user.password_hash);
-		if (!isValidPassword) {
-			return res.status(401).json({ error: "Invalid credentials" });
-		}
+		// Create or get anonymous user
+		const userId = crypto.randomUUID();
+		const username = `Player_${userId.substring(0, 8)}`;
+		
+		// Insert anonymous user
+		await db.query("INSERT INTO users (id, username, email, password_hash) VALUES (?, ?, ?, ?)", 
+			[userId, username, `${username}@anonymous.local`, ""]);
 
 		// Generate JWT token
-		const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "24h" });
+		const token = jwt.sign({ id: userId, username }, JWT_SECRET, { expiresIn: "24h" });
 
 		res.json({
 			message: "Login successful",
 			token,
-			user: { id: user.id, username: user.username, email: user.email },
+			user: { id: userId, username, email: `${username}@anonymous.local` },
 		});
 	} catch (error) {
 		console.error("Login error:", error);
@@ -160,6 +153,42 @@ app.post("/answer", async (req, res) => {
 	await db.query("INSERT INTO answers (uid, question, answer, time_taken) VALUES (?, ?, ?, ?)", [uid, question, answer, time]);
 
 	res.json({ status: "saved" });
+});
+
+// Admin endpoint to view user data
+app.get("/admin/data", async (req, res) => {
+	const db = getDB();
+	
+	try {
+		// Get all users with their event counts
+		const [userStats] = await db.query(`
+			SELECT u.id, u.username, u.email, u.created_at as user_created,
+			COUNT(e.id) as total_events,
+			SUM(CASE WHEN e.type = 'click' THEN 1 ELSE 0 END) as clicks,
+			SUM(CASE WHEN e.type = 'hover' THEN 1 ELSE 0 END) as hovers
+			FROM users u 
+			LEFT JOIN events e ON u.id = e.uid 
+			GROUP BY u.id, u.username, u.email, u.created_at 
+			ORDER BY u.created_at DESC
+		`);
+
+		// Get recent events
+		const [recentEvents] = await db.query(`
+			SELECT u.username, e.type, e.metadata, e.created_at 
+			FROM users u 
+			JOIN events e ON u.id = e.uid 
+			ORDER BY e.created_at DESC 
+			LIMIT 20
+		`);
+
+		res.json({
+			userStats,
+			recentEvents
+		});
+	} catch (error) {
+		console.error("Admin data error:", error);
+		res.status(500).json({ error: "Failed to get admin data" });
+	}
 });
 
 app.listen(4000, async () => {
