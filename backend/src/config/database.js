@@ -6,7 +6,7 @@ let db;
 
 async function runMigrations() {
 	try {
-		const migrationFiles = ["001_initial.sql", "002_add_auth.sql"];
+		const migrationFiles = ["001_initial.sql", "002_add_auth.sql", "003_add_question_time.sql"];
 
 		for (const file of migrationFiles) {
 			const migrationPath = path.join(__dirname, "../src/migrations", file);

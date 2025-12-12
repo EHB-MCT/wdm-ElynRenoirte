@@ -25,6 +25,38 @@
 				<h1>Marvel personality game</h1>
 				<button id="startQuizBtn">Start Quiz</button>
 			</div>
+
+			<!-- Quiz Container -->
+			<div id="quizContainer" style="display: none">
+				<div id="userInfo">
+					<span id="userDisplayQuiz"></span>
+					<button id="logoutBtnQuiz">Logout</button>
+				</div>
+				<h1>Marvel personality game</h1>
+				
+				<!-- Progress Bar -->
+				<div id="progressBar">
+					<div id="progressFill"></div>
+				</div>
+				<div id="progressText">Question 1 of 6</div>
+
+				<!-- Quiz Question -->
+				<div id="quizContent">
+					<div id="questionContainer">
+						<h2 id="questionText"></h2>
+						<div id="answersContainer"></div>
+					</div>
+				</div>
+
+				<!-- Results Screen -->
+				<div id="resultsContainer" style="display: none">
+					<h2>Your Marvel Personality is...</h2>
+					<div id="resultCharacter"></div>
+					<div id="resultDescription"></div>
+					<button id="restartQuiz">Take Quiz Again</button>
+					<button id="backToMenu">Back to Menu</button>
+				</div>
+			</div>
 		</div>
 
 		<script src="app.js"></script>

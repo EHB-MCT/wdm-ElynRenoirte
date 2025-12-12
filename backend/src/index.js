@@ -147,10 +147,10 @@ app.post("/event", async (req, res) => {
 
 //endpoint: store answers
 app.post("/answer", async (req, res) => {
-	const { uid, question, answer, time } = req.body;
+	const { uid, question, answer, time, questionTime } = req.body;
 	const db = getDB();
 
-	await db.query("INSERT INTO answers (uid, question, answer, time_taken) VALUES (?, ?, ?, ?)", [uid, question, answer, time]);
+	await db.query("INSERT INTO answers (uid, question, answer, time_taken, question_time) VALUES (?, ?, ?, ?, ?)", [uid, question, answer, time, questionTime]);
 
 	res.json({ status: "saved" });
 });
