@@ -355,8 +355,7 @@ tr:hover {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 	gap: 1.5rem;
-	align-items: stretch;         /* Ensure consistent panel heights */
-	overflow: hidden;            /* Prevent grid overflow */
+	align-items: start;         /* Allow panels to have their own height */
 }
 
 .analytics-panel,
@@ -366,12 +365,8 @@ tr:hover {
 	padding: 1.5rem;
 	border-radius: 8px;
 	box-shadow: var(--shadow);
-	height: 400px;              /* Fixed height prevents infinite expansion */
-	max-height: 400px;          /* Maximum height constraint */
-	min-height: 300px;          /* Minimum height for usability */
 	display: flex;               /* Enable flexbox layout */
-	flex-direction: column;       /* Stack title and canvas vertically */
-	overflow: hidden;            /* Prevent content overflow */
+	flex-direction: column;       /* Stack title and content vertically */
 }
 
 .analytics-panel h3,
@@ -387,10 +382,8 @@ tr:hover {
 .analytics-panel canvas,
 .behavior-panel canvas,
 .results-panel canvas {
-	flex: 1;                    /* Allow canvas to fill remaining space */
-	max-height: 350px;          /* Account for header + padding */
 	width: 100% !important;     /* Ensure full width */
-	overflow: hidden;            /* Prevent canvas overflow */
+	max-height: 400px;          /* Reasonable max height for charts */
 }
 
 /* Insights List */
@@ -614,10 +607,8 @@ button:active {
 	.analytics-panel,
 	.behavior-panel,
 	.results-panel {
-		height: 400px;           /* Consistent sizing on mobile */
-	max-height: 400px;
-	min-height: 300px;
-}
+		/* Remove fixed height constraints on mobile */
+	}
 
 /* Character Details Grid */
 .character-charts-grid {
@@ -628,6 +619,18 @@ button:active {
 }
 
 .character-detail-chart {
+	background: white;
+	padding: 1rem;
+	border-radius: 8px;
+	box-shadow: var(--shadow);
+	height: 400px;
+	max-height: 400px;
+	min-height: 300px;
+	display: flex;
+	flex-direction: column;
+}
+
+.character-chart-container {
 	background: white;
 	padding: 1rem;
 	border-radius: 8px;
