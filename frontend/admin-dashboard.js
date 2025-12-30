@@ -439,16 +439,17 @@ class AdminDashboard {
 		const tbody = document.getElementById("usersTableBody");
 		tbody.innerHTML = "";
 
-		users.forEach((user) => {
+users.forEach((user) => {
+			// Debug: log user object to see available fields
+			console.log('User data for table:', user);
+			
 			const row = document.createElement("tr");
 			row.innerHTML = `
 				<td>${user.username}</td>
 				<td>${user.email || "N/A"}</td>
-				<td>${user.browser || "N/A"}</td>
-				<td>${user.os || "N/A"}</td>
 				<td>${user.total_events || 0}</td>
-				<td>${user.answers_count || 0}</td>
-				<td>${this.formatTime(user.avg_answer_time)}</td>
+				<td>${user.click_count || 0}</td>
+				<td>${user.hover_count || 0}</td>
 				<td>
 					<button onclick="dashboard.showUserDetail('${user.id}')" class="btn-sm">
 						View Details
@@ -902,9 +903,6 @@ async loadResultsData() {
 				<div class="user-detail">
 					<h4>${user.username}</h4>
 					<p><strong>Email:</strong> ${user.email || "N/A"}</p>
-					<p><strong>Browser:</strong> ${user.browser || "N/A"}</p>
-					<p><strong>OS:</strong> ${user.os || "N/A"}</p>
-					<p><strong>Screen:</strong> ${user.screen_width || "N/A"} x ${user.screen_height || "N/A"}</p>
 					<p><strong>Total Events:</strong> ${user.total_events || 0}</p>
 					<p><strong>Click Count:</strong> ${user.click_count || 0}</p>
 					<p><strong>Hover Count:</strong> ${user.hover_count || 0}</p>
