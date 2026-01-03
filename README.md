@@ -40,6 +40,7 @@ Frontend:
 2. run Docker in the terminal: docker compose up --build, make sure to open the desktop app too
 3. open index.html with live server or with this: http://127.0.0.1:5500/frontend/index.html and then make the quiz (in the console you can see hovers, clicks etc being tracked)
 4. open admin-dashboard.html with live server or with this: http://127.0.0.1:5500/frontend/admin-dashboard.html now you can see all the data that was stored in the database visualized
+5. (the written report is also submitted in the comments in canvas if it can't be opened here)
 
 # Sources
 
