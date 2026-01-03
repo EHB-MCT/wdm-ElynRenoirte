@@ -1,4 +1,4 @@
-as a user i need to be able to login so a UID gets created
+as user i need a UID so i can be differentiated and have a profile
 
 as a user my clicks need to be tracked and also when i click on a button
 
