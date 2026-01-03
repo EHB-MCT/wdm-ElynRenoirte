@@ -25,7 +25,12 @@ async function runMigrations() {
 
 		console.log("Migrations executed successfully");
 	} catch (error) {
-		console.error("Migration error:", error);
+		// Ignore duplicate column errors for existing installations
+		if (error.code !== 'ER_DUP_FIELDNAME') {
+			console.error("Migration error:", error);
+		} else {
+			console.log("Ignoring duplicate column error - column already exists");
+		}
 	}
 }
 

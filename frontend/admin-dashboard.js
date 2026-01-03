@@ -592,9 +592,12 @@ class AdminDashboard {
 	async loadBehaviorData() {
 		const { answerHoverAnalysis, userBehavior } = this.analyticsData;
 
+		// Debug: Log what we received
+		console.log('Behavior Data - Answer Hover Analysis:', answerHoverAnalysis);
+		console.log('Behavior Data - User Behavior:', userBehavior);
+
 		this.updateEventDistributionChart();
 		this.updateHoverAnalysisTable(answerHoverAnalysis);
-		this.updateClickSpeedChart(userBehavior);
 	}
 
 	updateEventDistributionChart() {

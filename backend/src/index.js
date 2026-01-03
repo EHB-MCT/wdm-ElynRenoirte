@@ -247,19 +247,39 @@ app.get("/admin/analytics", async (req, res) => {
 		`);
 
 		// Answer hover patterns
+// Answer hover patterns - show summary of hover events
 		const [answerHoverAnalysis] = await db.query(`
 			SELECT 
-				a.answer,
-				COUNT(e.id) as hover_count,
+				'All Answers' as answer,
+				COUNT(*) as hover_count,
 				AVG(JSON_UNQUOTE(JSON_EXTRACT(e.metadata, '$.duration'))) as avg_hover_time
-			FROM answers a
-			LEFT JOIN events e ON a.uid = e.uid 
-				AND e.type = 'hover' 
-				AND JSON_EXTRACT(e.metadata, '$.answerText') LIKE CONCAT('%', a.answer, '%')
-			GROUP BY a.answer
-			HAVING hover_count > 0
-			ORDER BY avg_hover_time DESC
+			FROM events e 
+			WHERE e.type = 'hover'
+			LIMIT 1
 		`);
+
+		// Add individual answer hover patterns if data exists
+		if (answerHoverAnalysis && answerHoverAnalysis.length > 0) {
+			const [individualHovers] = await db.query(`
+				SELECT 
+					JSON_UNQUOTE(JSON_EXTRACT(e.metadata, '$.answerText')) as answer,
+					JSON_UNQUOTE(JSON_EXTRACT(e.metadata, '$.duration')) as duration
+				FROM events e 
+				WHERE e.type = 'hover'
+					AND JSON_EXTRACT(e.metadata, '$.answerText') IS NOT NULL
+				LIMIT 10
+			`);
+
+			// Combine summary and individual hovers
+			answerHoverAnalysis = [
+				...answerHoverAnalysis,
+				...individualHovers.map(hover => ({
+					answer: hover.answer,
+					hover_count: 1,
+					avg_hover_time: hover.duration
+				}))
+			];
+		}
 
 		// Answer results analysis
 		const [characterResults] = await db.query(`
