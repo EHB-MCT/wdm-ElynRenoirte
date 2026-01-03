@@ -204,7 +204,7 @@ class AdminDashboard {
 	updateCharacterChart(characterResults) {
 		const canvas = document.getElementById("characterOverviewChart");
 		if (!canvas) {
-			console.error('Character chart canvas not found for overview page');
+			console.error("Character chart canvas not found for overview page");
 			return;
 		}
 		const ctx = canvas.getContext("2d");
@@ -213,52 +213,33 @@ class AdminDashboard {
 			this.charts.character.destroy();
 		}
 
-		// Group answers by character result for better visualization
-		const characterGroups = {};
-		characterResults.forEach((result) => {
-			const character = result.answer_type || result.character;
-			if (!characterGroups[character]) {
-				characterGroups[character] = [];
-			}
-		});
+		// Debug: Log the raw data structure to understand it
+		console.log("Character Results Data:", characterResults.slice(0, 5)); // Show first 5 items
 
-		// Get all answers for each character
-		const allAnswers = characterResults.map((r) => r.answer_type || r.character);
-		const uniqueCharacters = [...new Set(allAnswers)];
+		// The data is already aggregated from the backend with result_count
+		// No need to count manually - just use the provided result_count
+		const sortedCharacters = characterResults.sort((a, b) => b.result_count - a.result_count).slice(0, 10); // Show top 10 characters
 
-		// Build data for stacked bar chart showing answer distribution
-		const datasets = uniqueCharacters.map((character, index) => {
-			const characterData = characterResults.filter((r) => (r.answer_type || r.character) === character);
+		const labels = sortedCharacters.map((result) => result.answer_type);
+		const data = sortedCharacters.map((result) => result.result_count);
 
-			// Count answers per character
-			const answerCounts = {};
-			characterData.forEach((result) => {
-				const answer = result.answer_type || result.character;
-				answerCounts[answer] = (answerCounts[answer] || 0) + 1;
-			});
+		// Debug: Log the final chart data
+		console.log("Chart Labels:", labels);
+		console.log("Chart Data:", data);
 
-			const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#FFD700", "#FF69B4", "#00BCD4", "#FF6B6B", "#4ECDC4", "#F8F9FA", "#E91E63", "#9C27B0", "#2196F3"];
-
-			return {
-				label: character,
-				data: Object.values(answerCounts)
-					.sort((a, b) => b - a)
-					.slice(0, 5), // Top 5 answers
-				backgroundColor: colors[index % colors.length],
-				borderColor: colors[index % colors.length],
-			};
-		});
+		// Generate colors for each bar
+		const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#FFD700", "#FF69B4", "#00BCD4", "#FF6B6B"];
 
 		this.charts.character = new Chart(ctx, {
 			type: "bar",
 			data: {
-				labels: uniqueCharacters,
+				labels: labels,
 				datasets: [
 					{
-						label: "Most Common Answers",
-						data: datasets.map((d) => d.data[0] || 0), // Take top answer as primary
-						backgroundColor: "#007bff",
-						borderColor: "#0056b3",
+						label: "Times Selected",
+						data: data,
+						backgroundColor: colors,
+						borderColor: colors.map((color) => color + "CC"), // Add transparency for borders
 						borderWidth: 2,
 					},
 				],
@@ -266,19 +247,19 @@ class AdminDashboard {
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
-				indexAxis: "x",
+				indexAxis: "y", // Horizontal bar chart for better readability of character names
 				scales: {
-					y: {
+					x: {
 						beginAtZero: true,
 						title: {
 							display: true,
-							text: "Number of Selections",
+							text: "Times Selected",
 						},
 					},
-					x: {
+					y: {
 						title: {
 							display: true,
-							text: "Marvel Characters",
+							text: "Answers",
 						},
 					},
 				},
@@ -289,11 +270,9 @@ class AdminDashboard {
 					tooltip: {
 						callbacks: {
 							label: function (context) {
-								const character = context[0].label;
-								const value = context[0].raw;
-								const total = context[0].dataset.data.reduce((a, b) => a + b, 0);
-								const percentage = ((value / total) * 100).toFixed(1);
-								return `${character}: ${value} selections (${percentage}%)`;
+								const index = context.dataIndex;
+								const result = sortedCharacters[index];
+								return `Selected ${result.result_count} times (${result.percentage}% of total)`;
 							},
 						},
 					},
@@ -439,10 +418,10 @@ class AdminDashboard {
 		const tbody = document.getElementById("usersTableBody");
 		tbody.innerHTML = "";
 
-users.forEach((user) => {
+		users.forEach((user) => {
 			// Debug: log user object to see available fields
-			console.log('User data for table:', user);
-			
+			console.log("User data for table:", user);
+
 			const row = document.createElement("tr");
 			row.innerHTML = `
 				<td>${user.username}</td>
@@ -514,9 +493,6 @@ users.forEach((user) => {
 		// Find most hesitant user
 		const mostHesitant = userBehavior.filter((u) => u.avg_hover_duration).sort((a, b) => parseFloat(b.avg_hover_duration) - parseFloat(a.avg_hover_duration))[0];
 
-		// Find fastest clicker
-		const fastestClicker = userBehavior.filter((u) => u.avg_click_speed).sort((a, b) => parseFloat(a.avg_click_speed) - parseFloat(b.avg_click_speed))[0];
-
 		// Find slowest answerer
 		const slowestAnswerer = userBehavior.filter((u) => u.avg_answer_time).sort((a, b) => parseFloat(b.avg_answer_time) - parseFloat(a.avg_answer_time))[0];
 
@@ -525,11 +501,6 @@ users.forEach((user) => {
 				title: "Most Hesitant User",
 				value: mostHesitant?.username || "N/A",
 				description: `Average hover: ${this.formatTime(mostHesitant?.avg_hover_duration)}`,
-			},
-			{
-				title: "Fastest Clicker",
-				value: fastestClicker?.username || "N/A",
-				description: `Average click time: ${this.formatTime(fastestClicker?.avg_click_speed)}`,
 			},
 			{
 				title: "Slowest Answerer",
@@ -598,7 +569,6 @@ users.forEach((user) => {
 					<tr>
 						<th>Question</th>
 						<th>Attempts</th>
-						<th>Avg Time</th>
 						<th>Max Time</th>
 					</tr>
 				</thead>
@@ -609,7 +579,6 @@ users.forEach((user) => {
 						<tr>
 							<td>${q.question}</td>
 							<td>${q.total_attempts}</td>
-							<td>${this.formatTime(q.avg_time)}</td>
 							<td>${this.formatTime(q.max_time_spent)}</td>
 						</tr>
 					`
@@ -736,31 +705,31 @@ users.forEach((user) => {
 		});
 	}
 
-async loadResultsData() {
+	async loadResultsData() {
 		// Force refresh analytics data to get updated behavioral traits
 		try {
 			// Add cache-busting parameter
 			const timestamp = new Date().getTime();
 			const response = await fetch(`${this.apiBase}/admin/analytics?t=${timestamp}`);
-			
+
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
-			
+
 			const freshAnalyticsData = await response.json();
-			console.log('Fresh analytics data received:', freshAnalyticsData);
-			
+			console.log("Fresh analytics data received:", freshAnalyticsData);
+
 			const { characterResults, behaviorCharacterCorrelation } = freshAnalyticsData;
-			
-			console.log('Behavior character correlation data:', behaviorCharacterCorrelation);
-			console.log('First object sample:', behaviorCharacterCorrelation[0]);
-			console.log('Keys in first object:', behaviorCharacterCorrelation[0] ? Object.keys(behaviorCharacterCorrelation[0]) : 'No objects');
-			
+
+			console.log("Behavior character correlation data:", behaviorCharacterCorrelation);
+			console.log("First object sample:", behaviorCharacterCorrelation[0]);
+			console.log("Keys in first object:", behaviorCharacterCorrelation[0] ? Object.keys(behaviorCharacterCorrelation[0]) : "No objects");
+
 			this.updateCharacterResultsChart(characterResults);
 			this.updateCharacterResultsTable(characterResults);
 			this.updateCorrelationTable(behaviorCharacterCorrelation);
 		} catch (error) {
-			console.error('Error loading fresh analytics data:', error);
+			console.error("Error loading fresh analytics data:", error);
 			// Fallback to existing data
 			const { characterResults, behaviorCharacterCorrelation } = this.analyticsData;
 			if (characterResults) this.updateCharacterDetailCharts(characterResults);
@@ -835,23 +804,18 @@ async loadResultsData() {
 
 	updateCorrelationTable(correlation) {
 		const container = document.getElementById("correlationTable");
-		
+
 		// Define the 8 main Marvel characters we want to show
-		const mainCharacters = [
-			'Black Widow', 'Iron Man', 'Spider-Man', 'Captain America',
-			'Thor', 'Hulk', 'Hawkeye', 'Doctor Strange'
-		];
+		const mainCharacters = ["Black Widow", "Iron Man", "Spider-Man", "Captain America", "Thor", "Hulk", "Hawkeye", "Doctor Strange"];
 
 		// Filter correlation data to only include the main characters
-		const characterCorrelation = correlation.filter(corr => 
-			mainCharacters.includes(corr.answer_type)
-		);
+		const characterCorrelation = correlation.filter((corr) => mainCharacters.includes(corr.answer_type));
 
 		// Assign meaningful traits based on behavioral patterns
 		const getBehavioralTrait = (character) => {
 			const hoverTime = parseFloat(character.avg_hover_duration) || 0;
 			const answerTime = parseFloat(character.avg_answer_time) || 0;
-			
+
 			if (hoverTime > 3000) {
 				return "Slow thinkers";
 			} else if (hoverTime > 1500) {

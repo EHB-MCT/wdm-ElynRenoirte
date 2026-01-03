@@ -255,7 +255,7 @@ app.get("/admin/analytics", async (req, res) => {
 			FROM answers a
 			LEFT JOIN events e ON a.uid = e.uid 
 				AND e.type = 'hover' 
-				AND JSON_EXTRACT(e.metadata, '$.target') LIKE CONCAT('%', a.answer, '%')
+				AND JSON_EXTRACT(e.metadata, '$.answerText') LIKE CONCAT('%', a.answer, '%')
 			GROUP BY a.answer
 			HAVING hover_count > 0
 			ORDER BY avg_hover_time DESC
@@ -358,44 +358,9 @@ app.get("/admin/analytics", async (req, res) => {
 				...character,
 				most_common_trait: trait
 			});
-			
-			let trait = "Balanced approach"; // Default trait
-			
-			// Analyze patterns to determine behavioral trait
-			if (behavior && behavior.avg_hover_duration && behavior.avg_hover_duration > 3000) { // > 3 seconds hover
-				trait = "Slow thinkers";
-			} else if (behavior && behavior.avg_hover_duration && behavior.avg_hover_duration > 1500) { // 1.5-3 seconds
-				trait = "Strategic planners";
-			} else if (behavior && behavior.avg_answer_time && behavior.avg_answer_time < 10) { // < 10 seconds per answer
-				trait = "Takes action quickly";
-			} else if (behavior && behavior.avg_answer_time && behavior.avg_answer_time > 30) { // > 30 seconds per answer
-				trait = "Careful decision makers";
-			} else if (behavior && behavior.total_clicks && behavior.total_answers && behavior.total_clicks > behavior.total_answers * 2) { // More than 2 clicks per answer
-				trait = "Exploratory users";
-			} else if (behavior && behavior.total_clicks && behavior.total_answers && behavior.total_clicks < behavior.total_answers) { // Less than 1 click per answer
-				trait = "Decisive users";
-			}
-
-			console.log(`Trait assigned for ${character.answer_type}: ${trait}`);
-
-			behaviorCharacterCorrelation.push({
-				...character,
-				most_common_trait: trait
-			});
 		}
 		
 		console.log('BEHAVIOR ANALYSIS COMPLETE. Final results:', behaviorCharacterCorrelation);
-				ORDER BY count DESC
-				LIMIT 1
-			`, [character.answer_type]);
-			
-			console.log(`Most common trait for ${character.answer_type}:`, allAnswersForUsers);
-			
-			behaviorCharacterCorrelation.push({
-				...character,
-				most_common_trait: allAnswersForUsers[0]?.answer || null
-			});
-		}
 
 		res.json({
 			userMetrics: userMetrics[0],

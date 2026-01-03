@@ -9,7 +9,7 @@ async function runMigrations() {
 		const migrationFiles = ["001_initial.sql", "002_add_auth.sql", "003_add_question_time.sql"];
 
 		for (const file of migrationFiles) {
-			const migrationPath = path.join(__dirname, "../src/migrations", file);
+			const migrationPath = path.join(__dirname, "../migrations", file);
 			const migrationSQL = fs.readFileSync(migrationPath, "utf8");
 
 			// Split the SQL file by semicolons and execute each statement
