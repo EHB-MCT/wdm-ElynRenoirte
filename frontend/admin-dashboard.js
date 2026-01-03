@@ -593,8 +593,8 @@ class AdminDashboard {
 		const { answerHoverAnalysis, userBehavior } = this.analyticsData;
 
 		// Debug: Log what we received
-		console.log('Behavior Data - Answer Hover Analysis:', answerHoverAnalysis);
-		console.log('Behavior Data - User Behavior:', userBehavior);
+		console.log("Behavior Data - Answer Hover Analysis:", answerHoverAnalysis);
+		console.log("Behavior Data - User Behavior:", userBehavior);
 
 		this.updateEventDistributionChart();
 		this.updateHoverAnalysisTable(answerHoverAnalysis);
@@ -631,7 +631,7 @@ class AdminDashboard {
 		const container = document.getElementById("hoverAnalysisTable");
 
 		if (!hoverAnalysis || hoverAnalysis.length === 0) {
-			container.innerHTML = "<p>No hover data available</p>";
+			container.innerHTML = "<p></p>";
 			return;
 		}
 
