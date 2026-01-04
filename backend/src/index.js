@@ -247,8 +247,8 @@ app.get("/admin/analytics", async (req, res) => {
 		`);
 
 		// Answer hover patterns
-// Answer hover patterns - show summary of hover events
-		const [answerHoverAnalysis] = await db.query(`
+		// Answer hover patterns - show summary of hover events
+		let [answerHoverAnalysis] = await db.query(`
 			SELECT 
 				'All Answers' as answer,
 				COUNT(*) as hover_count,
